@@ -1,0 +1,4 @@
+"employee_id","name","username","password","position"
+30001,马云,empl01,"10lpme",class_1
+30002,王健林,empl02,"20lpme",class_2
+30003,马化腾,empl03,"30lpme",class_2
