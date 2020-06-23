@@ -8,14 +8,16 @@ import (
 )
 
 type App struct {
-	JwtSecret       string
-	PageSize        int
-	PrefixUrl       string
-	RuntimeRootPath string
-	LogSavePath     string
-	LogSaveName     string
-	LogFileExt      string
-	TimeFormat      string
+	JwtSecretManager  string
+	JwtSecretCustomer string
+	JwtSecretEmployee string
+	PageSize          int
+	PrefixUrl         string
+	RuntimeRootPath   string
+	LogSavePath       string
+	LogSaveName       string
+	LogFileExt        string
+	TimeFormat        string
 }
 
 var AppSetting = &App{}

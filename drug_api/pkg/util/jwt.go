@@ -6,7 +6,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-var jwtSecret []byte
+var jwtSecretManager []byte
+var jwtSecretCustomer []byte
+var jwtSecretEmployee []byte
 
 type Claims struct {
 	Username string `json:"username"`
@@ -15,7 +17,7 @@ type Claims struct {
 }
 
 // GenerateToken generate tokens used for auth
-func GenerateToken(username, password string) (string, error) {
+func GenerateTokenManager(username, password string) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(3 * time.Hour)
 
@@ -24,20 +26,88 @@ func GenerateToken(username, password string) (string, error) {
 		EncodeMD5(password),
 		jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
-			Issuer:    "gin-blog",
+			Issuer:    "horika",
 		},
 	}
 
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, err := tokenClaims.SignedString(jwtSecret)
+	token, err := tokenClaims.SignedString(jwtSecretManager)
 
 	return token, err
 }
 
 // ParseToken parsing token
-func ParseToken(token string) (*Claims, error) {
+func ParseTokenManager(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
+		return jwtSecretManager, nil
+	})
+
+	if tokenClaims != nil {
+		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			return claims, nil
+		}
+	}
+
+	return nil, err
+}
+
+func GenerateTokenCustomer(username, password string) (string, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(3 * time.Hour)
+
+	claims := Claims{
+		EncodeMD5(username),
+		EncodeMD5(password),
+		jwt.StandardClaims{
+			ExpiresAt: expireTime.Unix(),
+			Issuer:    "horika",
+		},
+	}
+
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := tokenClaims.SignedString(jwtSecretCustomer)
+
+	return token, err
+}
+
+// ParseToken parsing token
+func ParseTokenCustomer(token string) (*Claims, error) {
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecretCustomer, nil
+	})
+
+	if tokenClaims != nil {
+		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+			return claims, nil
+		}
+	}
+
+	return nil, err
+}
+
+func GenerateTokenEmployee(username, password string) (string, error) {
+	nowTime := time.Now()
+	expireTime := nowTime.Add(3 * time.Hour)
+
+	claims := Claims{
+		EncodeMD5(username),
+		EncodeMD5(password),
+		jwt.StandardClaims{
+			ExpiresAt: expireTime.Unix(),
+			Issuer:    "horika",
+		},
+	}
+
+	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	token, err := tokenClaims.SignedString(jwtSecretEmployee)
+
+	return token, err
+}
+
+// ParseToken parsing token
+func ParseTokenEmployee(token string) (*Claims, error) {
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecretEmployee, nil
 	})
 
 	if tokenClaims != nil {
