@@ -6,6 +6,27 @@ FROM inventory_drug AS i, drug_sale_order AS d, sale_drug_list AS s
 WHERE d.drug_sale_order_id = s.drug_sale_order_id AND i.inventory_drug_id = s.inventory_drug_id
 GROUP BY d.drug_sale_order_id;
 
+-- 库存药带有药名
+CREATE VIEW inventory_drug_with_name(inventory_drug_id, drug_id, inventory_num, purchase_price, sale_price, supplier_id, cname) AS
+
+SELECT i.inventory_drug_id ,i.drug_id ,i.inventory_num ,i.purchase_price ,i.sale_price ,i.supplier_id ,d.cname 
+FROM inventory_drug AS i, drug d
+WHERE i.drug_id = d.drug_id ;
+
+-- 供应商药品带有药名
+CREATE VIEW supplier_drug_with_name AS
+
+SELECT sd.drug_id ,sd.sale_price ,sd.supplier_drug_id ,sd.supplier_id ,d.cname 
+FROM supplier_drug sd, drug d
+WHERE sd.drug_id = d.drug_id ;
+
+-- 供应商药品带有供应商名
+CREATE VIEW supplier_drug_with_sname AS
+
+SELECT sd.drug_id ,sd.sale_price ,sd.supplier_drug_id ,sd.supplier_id, s2.name 
+FROM supplier_drug sd, supplier s2 
+WHERE sd.supplier_id = s2.supplier_id ;
+
 -- 买药品订单总价
 CREATE VIEW buy_drug_total_price(drug_buy_order_id, total_price) AS
 
