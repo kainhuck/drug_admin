@@ -91,6 +91,21 @@ func GetTotalSales(c *gin.Context){
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
 
+func GetTotalProfit(c *gin.Context){
+	appG := app.Gin{C: c}
+	drugSaleOrderService := drug_sale_order_service.DrugSaleOrder{}
+	totalProfit , err := drugSaleOrderService.GetTotalProfit()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_TOTAL_PROFIT_FAILED, nil)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["totalProfit"] = totalProfit
+
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
 func GetDetailSaleOrder(c *gin.Context){
 	appG := app.Gin{C: c}
 	// 获取订单的id
@@ -108,8 +123,15 @@ func GetDetailSaleOrder(c *gin.Context){
 		return
 	}
 
+	totalPrice, err := drugSaleOrderService.GetSaleOrderTotalPrice()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_DETAIL_SALE_ORDER_FAILED ,nil)
+		return
+	}
+
 	data := make(map[string]interface{})
 	data["saleOrder"] = order
+	data["totalPrice"] = totalPrice
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
@@ -131,8 +153,15 @@ func GetCustomerDetailSaleOrder(c *gin.Context){
 		return
 	}
 
+	totalPrice, err := drugSaleOrderService.GetSaleOrderTotalPrice()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_DETAIL_SALE_ORDER_FAILED ,nil)
+		return
+	}
+
 	data := make(map[string]interface{})
 	data["saleOrder"] = order
+	data["totalPrice"] = totalPrice
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

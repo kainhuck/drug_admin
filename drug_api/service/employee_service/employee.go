@@ -14,9 +14,12 @@ type Employee struct {
 	EndTime            string
 	NewPassword        string
 	ConfirmPassword    string
+	EmployeesPageNum   int
+	EmployeesPageSize  int
+	NewPosition        string
 }
 
-func (e *Employee) Check() (bool, error) {
+func (e *Employee) Check() (int, bool, error) {
 	return models.CheckEAuth(e.Username, e.Password)
 }
 
@@ -78,14 +81,38 @@ func (e *Employee) CountEmployeePeriodSales() (int, error) {
 	return models.GetEmployeePeriodSalesTotal(e.StartTime, e.EndTime, e.EmployeeID)
 }
 
-func (e *Employee)EditEmployeePassword()error{
+func (e *Employee) GetEmployeePeriodSalesTotalPrice() (int, error) {
+	return models.GetEmployeePeriodSalesTotalPrice(e.StartTime, e.EndTime, e.EmployeeID)
+}
+
+func (e *Employee) EditEmployeePassword() error {
 	return models.EditEmployeePassword(e.EmployeeID, e.NewPassword)
 }
 
-func (e *Employee)AddEmployee()(int, error){
+func (e *Employee) EditEmployeePosition() error {
+	return models.EditEmployeePosition(e.EmployeeID, e.NewPosition)
+}
+
+func (e *Employee) AddEmployee() (int, error) {
 	return models.AddEmployee(e.Username, e.Password, e.Name, e.Position)
 }
 
-func (e *Employee)ExistByUsername()(bool, error){
+func (e *Employee) ExistByUsername() (bool, error) {
 	return models.ExistByUsername(e.Username)
+}
+
+func (e *Employee) GetEmployees() ([]*models.Employee, error) {
+	return models.GetEmployees(e.EmployeesPageNum, e.EmployeesPageSize)
+}
+
+func (e *Employee) GetAllEmployees () ([]*models.Employee, error) {
+	return models.GetAllEmployees()
+}
+
+func (e *Employee) CountEmployees() (int, error) {
+	return models.GetTotalEmployees()
+}
+
+func (e *Employee) GetEmployeeByID() (*models.Employee, error) {
+	return models.GetEmployeeByID(e.EmployeeID)
 }

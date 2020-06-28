@@ -8,6 +8,7 @@ import (
 	"drug_api/pkg/util"
 	"drug_api/service/drug_buy_order_service"
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/unknwon/com"
 	"net/http"
@@ -21,6 +22,7 @@ func AddDrugBuyOrder(c *gin.Context) {
 	drugStr := c.PostForm("drugs")
 	var drugs []models.DrugWithNum
 	err := json.Unmarshal([]byte(drugStr), &drugs)
+	fmt.Println(err)
 	if err != nil {
 		appG.Response(http.StatusBadRequest, e.INVALID_PARAMS, nil)
 		return
@@ -104,8 +106,15 @@ func GetDetailBuyOrder(c *gin.Context) {
 		return
 	}
 
+	totalPrice, err := drugBuyOrderService.GetBuyOrderTotalPrice()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_DETAIL_BUY_ORDER_FAILED ,nil)
+		return
+	}
+
 	data := make(map[string]interface{})
 	data["buyOrder"] = order
+	data["totalPrice"] = totalPrice
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

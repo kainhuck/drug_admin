@@ -72,3 +72,23 @@ func AddManager(c *gin.Context) {
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
+
+func GetManager(c *gin.Context) {
+	appG := app.Gin{C: c}
+	mid := com.StrTo(c.Param("mid")).MustInt()
+
+	managerService := manager_service.Manager{
+		ManagerID: mid,
+	}
+
+	manager,err := managerService.GetManager()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_MANAGER_FAILED, nil)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["manager"] = manager
+
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}

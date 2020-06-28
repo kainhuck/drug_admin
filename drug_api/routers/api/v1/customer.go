@@ -26,90 +26,131 @@ func GetCustomerSaleInfo(c *gin.Context) {
 		SaleDetailPageSize: setting.AppSetting.PageSize,
 	}
 
-	orders , err := customerService.GetCustomerSaleInfo()
+	orders, err := customerService.GetCustomerSaleInfo()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_SALES_FAILED ,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_SALES_FAILED, nil)
 		return
 	}
 
-	count ,err := customerService.CountCustomerPeriodSales()
+	count, err := customerService.CountCustomerPeriodSales()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_SALES_COUNT_FAILED ,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_SALES_COUNT_FAILED, nil)
+		return
+	}
+
+	customer, err := customerService.GetCustomerByID()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_FAILED, nil)
+		return
+	}
+
+	totalPrice, err := customerService.GetCustomerPeriodSalesTotalPrice()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMER_TOTAL_PRICE_FAILED, nil)
 		return
 	}
 
 	data := make(map[string]interface{})
 	data["orders"] = orders
 	data["count"] = count
+	data["customer"] = customer
+	data["totalPrice"] = totalPrice
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }
 
-func EditCustomerPassword(c *gin.Context){
+func EditCustomerPassword(c *gin.Context) {
 	appG := app.Gin{C: c}
 	id := com.StrTo(c.Param("id")).MustInt()
 	newPassword := c.PostForm("new_password")
 	confirmPassword := c.PostForm("confirm_password")
 
-	if newPassword != confirmPassword{
-		appG.Response(http.StatusInternalServerError, e.ERROR_DIFF_PASSWORD ,nil)
+	if newPassword != confirmPassword {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DIFF_PASSWORD, nil)
 		return
 	}
 
 	customerService := customer_service.Customer{
-		CustomerID: id,
-		NewPassword: newPassword,
+		CustomerID:      id,
+		NewPassword:     newPassword,
 		ConfirmPassword: confirmPassword,
 	}
 
 	err := customerService.EditCustomerPassword()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_EDIT_PASSWORD_FAILED ,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_EDIT_PASSWORD_FAILED, nil)
 		return
 	}
 
 	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 
-func AddCustomer(c *gin.Context){
+func AddCustomer(c *gin.Context) {
 	appG := app.Gin{C: c}
 	phone := c.PostForm("phone")
 	password := c.PostForm("password")
 	confirmPassword := c.PostForm("confirm_password")
 	name := c.PostForm("name")
 
-	if password != confirmPassword{
-		appG.Response(http.StatusInternalServerError, e.ERROR_DIFF_PASSWORD ,nil)
+	if password != confirmPassword {
+		appG.Response(http.StatusInternalServerError, e.ERROR_DIFF_PASSWORD, nil)
 		return
 	}
 
 	customerService := customer_service.Customer{
-		Name: name,
+		Name:     name,
 		Username: phone,
 		Password: password,
-		Phone: phone,
+		Phone:    phone,
 	}
 
 	// 检查号码是否重复
 	flag, err := customerService.ExistByPhone()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_CHECK_EXIST_FAILED ,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_CHECK_EXIST_FAILED, nil)
 		return
 	}
 
-	if flag{
-		appG.Response(http.StatusInternalServerError, e.ERROR_EXIST_USERNAME ,nil)
+	if flag {
+		appG.Response(http.StatusInternalServerError, e.ERROR_EXIST_USERNAME, nil)
 		return
 	}
 
-	id ,err := customerService.AddCustomer()
+	id, err := customerService.AddCustomer()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_NEW_MANAGER_FAILED,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_NEW_MANAGER_FAILED, nil)
 		return
 	}
 
 	data := make(map[string]interface{})
 	data["id"] = id
+
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+func GetCustomers(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	customerService := customer_service.Customer{
+		CustomersPageNum:  util.GetPage(c),
+		CustomersPageSize: setting.AppSetting.PageSize,
+	}
+
+	customers, err := customerService.GetCustomers()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMERS_FAILED, nil)
+		return
+	}
+
+	count, err := customerService.CountCustomers()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_CUSTOMERS_COUNT_FAILED, nil)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["customers"] = customers
+	data["count"] = count
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

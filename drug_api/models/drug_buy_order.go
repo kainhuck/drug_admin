@@ -108,7 +108,7 @@ func AddDrugBuyOrder(mid int, sid int, buyDate time.Time, drugs []DrugWithNum) e
 
 func GetPeriodBuy(startTime, endTime string, pageNum, pageSize int) ([]DrugBuyOrder, error) {
 	var drugS []DrugBuyOrder
-	err := db.Where("buy_date BETWEEN ? AND ?", startTime, endTime).Offset(pageNum).Limit(pageSize).Find(&drugS).Error
+	err := db.Where("buy_date BETWEEN ? AND DATE_ADD(?,INTERVAL 1 DAY)", startTime, endTime).Offset(pageNum).Limit(pageSize).Find(&drugS).Error
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func GetPeriodBuy(startTime, endTime string, pageNum, pageSize int) ([]DrugBuyOr
 // 获取某时间段的订单总数
 func GetPeriodBuyTotal(startTime, endTime string) (int, error) {
 	var count int
-	err := db.Model(DrugBuyOrder{}).Where("buy_date BETWEEN ? AND ?", startTime, endTime).Count(&count).Error
+	err := db.Model(DrugBuyOrder{}).Where("buy_date BETWEEN ? AND DATE_ADD(?,INTERVAL 1 DAY)", startTime, endTime).Count(&count).Error
 	if err != nil {
 		return 0, err
 	}
@@ -140,7 +140,7 @@ func GetTotalBuy() (int, error) {
 	return totalPrice, nil
 }
 
-func GetDrugBuyOrderByID(id int)(*DrugBuyOrder, error){
+func GetDrugBuyOrderByID(id int) (*DrugBuyOrder, error) {
 	var order DrugBuyOrder
 	err := db.Where("drug_buy_order_id = ?", id).First(&order).Error
 	if err != nil {
@@ -148,4 +148,16 @@ func GetDrugBuyOrderByID(id int)(*DrugBuyOrder, error){
 	}
 
 	return &order, nil
+}
+
+func GetBuyOrderTotalPrice(id int) (int, error) {
+	var price struct {
+		TotalPrice int `json:"total_price"`
+	}
+	err := db.Table("buy_drug_total_price").Where("drug_buy_order_id = ?", id).First(&price).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return price.TotalPrice, nil
 }

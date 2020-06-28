@@ -13,10 +13,28 @@ type InventoryDrug struct {
 	PageNum         int
 	PageSize        int
 	NewSalePrice    int
+	SearchContent   string
 }
 
 func (i *InventoryDrug) GetAllInvDrugs() ([]*models.InventoryDrug, error) {
 	return models.GetInvDrugs(i.PageNum, i.PageSize, map[string]interface{}{})
+}
+
+func (i *InventoryDrug) SearchAllInvDrugs () ([]*models.InventoryDrugWithName, error) {
+	return models.SearchAllInvDrugs(i.PageNum, i.PageSize, i.SearchContent)
+}
+
+func (i *InventoryDrug) SearchAllInvDrugsCustomer () ([]*models.InventoryDrugWithName, error) {
+	drugs ,err := models.SearchAllInvDrugs(i.PageNum, i.PageSize, i.SearchContent)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, v:= range drugs{
+		v.PurchasePrice = -1
+	}
+
+	return drugs, nil
 }
 
 func (i *InventoryDrug) GetAllInvDrugsCustomer() ([]*models.InventoryDrug, error) {
@@ -27,6 +45,10 @@ func (i *InventoryDrug) Count() (int, error) {
 	return models.GetInvDrugTotal(map[string]interface{}{})
 }
 
-func (i *InventoryDrug)EditInvDrugSalePrice()error{
+func (i *InventoryDrug) CountSearch() (int, error) {
+	return models.GetSearchInvDrugTotal(i.SearchContent)
+}
+
+func (i *InventoryDrug) EditInvDrugSalePrice() error {
 	return models.EditInvDrugSalePrice(i.InventoryDrugID, i.NewSalePrice)
 }

@@ -35,7 +35,7 @@ func GetMAuth(c *gin.Context) {
 	}
 
 	authService := manager_service.Manager{Username: username, Password: password}
-	isExist, err := authService.Check()
+	mid, isExist, err := authService.Check()
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR_AUTH_CHECK_TOKEN_FAIL, nil)
 		return
@@ -52,7 +52,8 @@ func GetMAuth(c *gin.Context) {
 		return
 	}
 
-	appG.Response(http.StatusOK, e.SUCCESS, map[string]string{
+	appG.Response(http.StatusOK, e.SUCCESS, map[string]interface{}{
 		"token": token,
+		"id": mid,
 	})
 }

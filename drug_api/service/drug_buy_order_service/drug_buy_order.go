@@ -132,3 +132,7 @@ func (d *DrugBuyOrder) GetDetailBuyOrder() (interface{}, error) {
 
 	return ret, nil
 }
+
+func (d *DrugBuyOrder) GetBuyOrderTotalPrice() (int, error) {
+	return models.GetBuyOrderTotalPrice(d.DrugBuyOrderID)
+}

@@ -81,6 +81,10 @@ func (dso *DrugSaleOrder) GetTotalSales() (int, error) {
 	return models.GetTotalSales()
 }
 
+func (dso *DrugSaleOrder) GetTotalProfit() (int, error) {
+	return models.GetTotalProfit()
+}
+
 func (dso *DrugSaleOrder) GetDetailSaleOrder() (interface{}, error) {
 	ret := make(map[string]interface{})
 
@@ -214,4 +218,24 @@ func (dso *DrugSaleOrder) GetCustomerDetailSaleOrder() (interface{}, error) {
 	ret["drug_list"] = drugList
 
 	return ret, nil
+}
+
+func (dso *DrugSaleOrder) GetSaleOrderTotalPrice() (int, error) {
+	sum := 0
+	// 获取该订单的库存id和数量
+	drugs, err := models.GetSaleDrugListsByDrugSaleOrderID(dso.DetailPageNum, dso.DetailPageSize, dso.DrugSaleOrderID)
+	if err != nil {
+		return 0, err
+	}
+
+	// 查找该库存药的售价
+	for _, v := range drugs {
+		idrug, err :=models.GetInvDrugByID(v.InventoryDrugID)
+		if err != nil {
+			return 0, err
+		}
+		sum += idrug.SalePrice * v.Num
+	}
+
+	return sum, nil
 }

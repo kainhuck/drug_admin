@@ -11,18 +11,18 @@ type Employee struct {
 }
 
 // CheckEAuth checks if authentication information exists
-func CheckEAuth(username, password string) (bool, error) {
+func CheckEAuth(username, password string) (int, bool, error) {
 	var auth Employee
 	err := db.Select("employee_id").Where(Employee{Username: username, Password: password}).First(&auth).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return false, err
+		return 0, false, err
 	}
 
 	if auth.EmployeeID > 0 {
-		return true, nil
+		return auth.EmployeeID, true, nil
 	}
 
-	return false, nil
+	return 0, false, nil
 }
 
 func GetEmployeeByID(id int) (*Employee, error){
@@ -37,6 +37,10 @@ func GetEmployeeByID(id int) (*Employee, error){
 
 func EditEmployeePassword(id int, newPassword string) error {
 	return db.Model(Employee{}).Where("employee_id = ?",id).Update("password", newPassword).Error
+}
+
+func EditEmployeePosition(id int, newPosition string) error {
+	return db.Model(Employee{}).Where("employee_id = ?",id).Update("position", newPosition).Error
 }
 
 func AddEmployee(username, password, name, positon string)(int, error){
@@ -67,4 +71,39 @@ func ExistByUsername(username string)(bool, error){
 	}
 
 	return false, nil
+}
+
+func GetEmployees(pageNum int, pageSize int)([]*Employee, error){
+	var employees []*Employee
+	err := db.Offset(pageNum).Limit(pageSize).Find(&employees).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return employees, nil
+}
+
+func GetAllEmployees()([]*Employee, error){
+	var employees []*Employee
+	err := db.Find(&employees).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _,v:=range employees{
+		v.Username = ""
+		v.Password = ""
+	}
+
+	return employees, nil
+}
+
+func GetTotalEmployees() (int, error) {
+	var count int
+	err := db.Model(Employee{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, err
 }

@@ -34,15 +34,49 @@ func GetEmployeeSaleInfo(c *gin.Context) {
 
 	count ,err := employeeService.CountEmployeePeriodSales()
 	if err != nil {
-		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEE_SALES_COUNT_FAILED ,nil)
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEE_SALES_COUNT_FAILED, nil)
+		return
+	}
+
+	employee, err := employeeService.GetEmployeeByID()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMLOYEE_FAILED, nil)
+		return
+	}
+
+	totalPrice, err := employeeService.GetEmployeePeriodSalesTotalPrice()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEE_TOTAL_PRICE_FAILED, nil)
 		return
 	}
 
 	data := make(map[string]interface{})
 	data["orders"] = orders
 	data["count"] = count
+	data["employee"] = employee
+	data["totalPrice"] = totalPrice
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+// 修改员工职称
+func EditEmployeePosition(c *gin.Context){
+	appG := app.Gin{C: c}
+	id := com.StrTo(c.Param("id")).MustInt()
+	newPosition := c.PostForm("new_position")
+
+	employeeService := employee_service.Employee{
+		EmployeeID: id,
+		NewPosition: newPosition,
+	}
+
+	err := employeeService.EditEmployeePosition()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_EDIT_POSITION_FAILED ,nil)
+		return
+	}
+
+	appG.Response(http.StatusOK, e.SUCCESS, nil)
 }
 
 func EditEmployeePassword(c *gin.Context){
@@ -110,6 +144,51 @@ func AddEmployee(c *gin.Context) {
 
 	data := make(map[string]interface{})
 	data["id"] = id
+
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+func GetEmployees(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	employeeService := employee_service.Employee{
+		EmployeesPageNum: util.GetPage(c),
+		EmployeesPageSize: setting.AppSetting.PageSize,
+	}
+
+	employees, err := employeeService.GetEmployees()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEES_FAILED, nil)
+		return
+	}
+
+	count, err := employeeService.CountEmployees()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEES_COUNT_FAILED, nil)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["employees"] = employees
+	data["count"] = count
+
+	appG.Response(http.StatusOK, e.SUCCESS, data)
+}
+
+func GetAllEmployees(c *gin.Context) {
+	appG := app.Gin{C: c}
+
+	employeeService := employee_service.Employee{}
+
+	employees, err := employeeService.GetAllEmployees()
+	if err != nil {
+		appG.Response(http.StatusInternalServerError, e.ERROR_GET_EMPLOYEES_FAILED, nil)
+		return
+	}
+
+
+	data := make(map[string]interface{})
+	data["employees"] = employees
 
 	appG.Response(http.StatusOK, e.SUCCESS, data)
 }

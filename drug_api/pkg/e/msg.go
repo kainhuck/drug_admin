@@ -35,6 +35,19 @@ var MsgFlags = map[int]string{
 	ERROR_NEW_MANAGER_FAILED:                  "新建经理失败",
 	ERROR_CHECK_EXIST_FAILED:                  "检查是否存在失败",
 	ERROR_EXIST_USERNAME:                      "账户名已存在",
+	ERROR_NOT_EXIST_DRUG:                      "药品不存在",
+	ERROR_GET_DRUG_FAILED:                     "获取该药品失败",
+	ERROR_GET_EMPLOYEES_FAILED:                "获取全部员工信息失败",
+	ERROR_GET_EMPLOYEES_COUNT_FAILED:          "获取全部员工数量失败",
+	ERROR_EDIT_POSITION_FAILED:                "修改员工职称失败",
+	ERROR_GET_EMLOYEE_FAILED:                  "获取员工失败",
+	ERROR_GET_EMPLOYEE_TOTAL_PRICE_FAILED:     "获取员工销售总额失败",
+	ERROR_GET_CUSTOMERS_FAILED:                "获取全部顾客失败",
+	ERROR_GET_CUSTOMERS_COUNT_FAILED:          "获取全部顾客数量失败",
+	ERROR_GET_CUSTOMER_FAILED:                 "获取顾客失败",
+	ERROR_GET_CUSTOMER_TOTAL_PRICE_FAILED:     "获取顾客总价失败",
+	ERROR_GET_MANAGER_FAILED:                  "获取经理信息失败",
+	ERROR_GET_TOTAL_PROFIT_FAILED:             "获取总利润失败",
 }
 
 // GetMsg get error information based on Code

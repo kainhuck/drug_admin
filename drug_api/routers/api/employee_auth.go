@@ -35,7 +35,7 @@ func GetEAuth(c *gin.Context) {
 	}
 
 	authService := employee_service.Employee{Username: username, Password: password}
-	isExist, err := authService.Check()
+	eid, isExist, err := authService.Check()
 	if err != nil {
 		appG.Response(http.StatusInternalServerError, e.ERROR_AUTH_CHECK_TOKEN_FAIL, nil)
 		return
@@ -52,7 +52,8 @@ func GetEAuth(c *gin.Context) {
 		return
 	}
 
-	appG.Response(http.StatusOK, e.SUCCESS, map[string]string{
+	appG.Response(http.StatusOK, e.SUCCESS, map[string]interface{}{
 		"token": token,
+		"id": eid,
 	})
 }

@@ -13,18 +13,18 @@ type Customer struct {
 }
 
 // CheckCAuth checks if authentication information exists
-func CheckCAuth(username, password string) (bool, error) {
+func CheckCAuth(username, password string) (int, bool, error) {
 	var auth Customer
 	err := db.Select("customer_id").Where(Customer{Username: username, Password: password}).First(&auth).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return false, err
+		return 0, false, err
 	}
 
 	if auth.CustomerID > 0 {
-		return true, nil
+		return auth.CustomerID, true, nil
 	}
 
-	return false, nil
+	return 0, false, nil
 }
 
 func GetCustomerByID(id int)(*Customer, error){
@@ -69,4 +69,24 @@ func ExistByPhone(phone string)(bool, error){
 	}
 
 	return false, nil
+}
+
+func GetCustomers(pageNum, pageSize int)([]*Customer, error){
+	var customers []*Customer
+	err := db.Offset(pageNum).Limit(pageSize).Find(&customers).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return customers, nil
+}
+
+func CountCustomers() (int, error) {
+	var count int
+	err := db.Model(Customer{}).Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }

@@ -3,31 +3,33 @@ package models
 import "github.com/jinzhu/gorm"
 
 type Drug struct {
-	DrugID           int        `gorm:"primary_key" json:"drug_id"`
-	Cname            string     `json:"cname"`
-	Ename            string     `json:"ename"`
-	Introduction     string     `json:"introduction"`
-	Component        string     `json:"component"`
-	Property         string     `json:"property"`
-	Indication       string     `json:"indication"`
-	MedicFormat      string     `json:"medic_format"`
-	Taboo            string     `json:"taboo"`
-	Ytime            string     `json:"ytime"`
-	Mstandard        string     `json:"mstandard"`
-	Dosage           string     `json:"dosage"`
-	AdverseReactions string     `json:"adverseReactions"`
-	Interactions     string     `json:"interactions"`
-	Notice           string     `json:"notice"`
-	DrugType         string     `json:"drug_type"`
-	DrugHealthType   string     `json:"drug_health_type"`
-	DrugRecipeType   string     `json:"drug_recipe_type"`
-}
+	DrugID           int    `gorm:"primary_key" json:"drug_id"`
+	Cname            string `json:"cname"`
+	Ename            string `json:"ename"`
+	Introduction     string `json:"introduction"`
+	Component        string `json:"component"`
+	Property         string `json:"property"`
+	Indication       string `json:"indication"`
+	MedicFormat      string `json:"medic_format"`
+	Taboo            string `json:"taboo"`
+	Ytime            string `json:"ytime"`
+	Mstandard        string `json:"mstandard"`
+	Dosage           string `json:"dosage"`
+	AdverseReactions string `json:"adverseReactions"`
+	Interactions     string `json:"interactions"`
+	Notice           string `json:"notice"`
+	DrugType         string `json:"drug_type"`
+	DrugHealthType   string `json:"drug_health_type"`
+	DrugRecipeType   string `json:"drug_recipe_type"`
+	Thumb            string `json:"thumb"`
+}	
 
 type DrugWithNum map[string]int
+
 // ExistDrugByID checks
 func ExistDrugByID(id int) (bool, error) {
 	var drug Drug
-	err := db.Select("durg_id").Where("durg_id = ?", id).First(&drug).Error
+	err := db.Select("drug_id").Where("drug_id = ?", id).First(&drug).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return false, err
 	}

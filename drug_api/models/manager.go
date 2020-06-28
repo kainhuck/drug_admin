@@ -9,23 +9,23 @@ type Manager struct {
 }
 
 // CheckMAuth checks if authentication information exists
-func CheckMAuth(username, password string) (bool, error) {
+func CheckMAuth(username, password string) (int, bool, error) {
 	var auth Manager
 	err := db.Select("manager_id").Where(Manager{Username: username, Password: password}).First(&auth).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return false, err
+		return 0, false, err
 	}
 
 	if auth.ManagerID > 0 {
-		return true, nil
+		return auth.ManagerID, true, nil
 	}
 
-	return false, nil
+	return 0, false, nil
 }
 
 func GetManagerByID(id int) (*Manager, error){
 	var manager Manager
-	err := db.Select("manager_id, username").Where("manager_id = ?", id).First(&manager).Error
+	err := db.Where("manager_id = ?", id).First(&manager).Error
 	if err != nil {
 		return nil, err
 	}
